@@ -2,8 +2,8 @@
   "buildCommand": "python manage.py collectstatic --noinput",
   "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "/api"
+      "source": "/(.*)",
+      "destination": "/api"
     }
   ]
 }
