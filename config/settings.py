@@ -129,6 +129,8 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+if os.environ.get("VERCEL"):
+    STATIC_ROOT = Path("/tmp/dropnote-static")
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
