@@ -10,8 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
 
 import dj_database_url
 
@@ -26,13 +26,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-only-change-me")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DJANGO_DEBUG", "True").lower() == "true"
+is_vercel = bool(os.environ.get("VERCEL"))
+DEBUG = (
+    os.environ.get(
+        "DJANGO_DEBUG",
+        "False" if is_vercel else "True",
+    ).lower()
+    == "true"
+)
 
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
-    if host.strip()
-]
+allowed_hosts = os.environ.get(
+    "DJANGO_ALLOWED_HOSTS",
+    "localhost,127.0.0.1,.vercel.app",
+)
+if os.environ.get("VERCEL_URL"):
+    allowed_hosts += f",{os.environ['VERCEL_URL']}"
+ALLOWED_HOSTS = [host.strip() for host in allowed_hosts.split(",") if host.strip()]
 
 
 # Application definition

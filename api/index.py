@@ -8,9 +8,11 @@ sys.path.insert(0, str(PROJECT_ROOT))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 os.environ.setdefault("VERCEL", "1")
 
-from django.core.wsgi import get_wsgi_application
+import django
 from django.core.management import call_command
+from django.core.wsgi import get_wsgi_application
 
+django.setup()
 call_command("collectstatic", interactive=False, verbosity=0)
 application = get_wsgi_application()
 app = application

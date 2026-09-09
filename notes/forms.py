@@ -6,9 +6,9 @@ from .models import Note
 class NoteForm(forms.ModelForm):
     class Meta:
         model = Note
-        fields = ["title", "content", "category", "link"]
+        fields = ["title", "content", "category", "link"]  # noqa: RUF012
 
-        widgets = {
+        widgets = {  # noqa: RUF012
             "title": forms.TextInput(
                 attrs={
                     "placeholder": "Give your note a clear title...",
