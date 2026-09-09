@@ -3,179 +3,1475 @@
 {% block title %}New note — DropNote{% endblock %}
 
 {% block content %}
-<section class="writer-page" aria-labelledby="writer-title">
 
-    <div class="writer-shell">
+<style>
+/* ============================================================
+   DROPNOTE — CREATE NOTE
+   Standalone writing experience
+   Mobile-first / fully responsive
+   ============================================================ */
 
-        <!-- Header -->
-        <header class="writer-topbar">
-            <a class="writer-back" href="{% url 'notes:index' %}" aria-label="Back to notes">
-                <span aria-hidden="true">←</span>
+:root {
+    --dn-bg: #f6f6f3;
+    --dn-paper: #ffffff;
+    --dn-paper-soft: #fafaf8;
+    --dn-ink: #17181c;
+    --dn-ink-soft: #3d4048;
+    --dn-muted: #747780;
+    --dn-faint: #a5a7ad;
+    --dn-line: rgba(23, 24, 28, .09);
+    --dn-line-strong: rgba(23, 24, 28, .15);
+
+    --dn-violet: #7652e8;
+    --dn-violet-dark: #5b3ac8;
+    --dn-violet-soft: rgba(118, 82, 232, .09);
+
+    --dn-cyan: #159bc7;
+    --dn-danger: #c93658;
+
+    --dn-radius-sm: 10px;
+    --dn-radius-md: 16px;
+    --dn-radius-lg: 24px;
+
+    --dn-shadow-sm:
+        0 1px 2px rgba(23,24,28,.04),
+        0 5px 18px rgba(23,24,28,.035);
+
+    --dn-shadow-lg:
+        0 24px 70px rgba(23,24,28,.08),
+        0 4px 18px rgba(23,24,28,.04);
+}
+
+
+/* ============================================================
+   PAGE
+   ============================================================ */
+
+.dn-create-page {
+    min-height: calc(100vh - 64px);
+    background:
+        radial-gradient(
+            circle at 85% 0%,
+            rgba(118,82,232,.08),
+            transparent 22rem
+        ),
+        radial-gradient(
+            circle at 10% 35%,
+            rgba(21,155,199,.035),
+            transparent 20rem
+        ),
+        var(--dn-bg);
+
+    color: var(--dn-ink);
+
+    padding: 0 14px 48px;
+
+    overflow-x: clip;
+}
+
+
+/* subtle editorial grid */
+
+.dn-create-page::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+
+    opacity: .25;
+
+    background-image:
+        linear-gradient(
+            rgba(23,24,28,.025) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(23,24,28,.025) 1px,
+            transparent 1px
+        );
+
+    background-size: 40px 40px;
+
+    mask-image: linear-gradient(
+        to bottom,
+        black,
+        transparent 70%
+    );
+}
+
+.dn-create-container {
+    position: relative;
+    z-index: 1;
+
+    width: min(100%, 1180px);
+    margin: 0 auto;
+}
+
+
+/* ============================================================
+   TOP NAV / CONTEXT
+   ============================================================ */
+
+.dn-create-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    min-height: 68px;
+
+    border-bottom: 1px solid var(--dn-line);
+}
+
+
+.dn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    min-height: 44px;
+    padding: 8px 10px;
+
+    margin-left: -10px;
+
+    color: var(--dn-muted);
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 650;
+
+    border-radius: 10px;
+
+    transition:
+        color .2s ease,
+        background .2s ease,
+        transform .2s ease;
+}
+
+.dn-back:hover {
+    color: var(--dn-ink);
+    background: rgba(23,24,28,.05);
+}
+
+.dn-back:active {
+    transform: translateY(1px);
+}
+
+
+.dn-back-arrow {
+    display: grid;
+    place-items: center;
+
+    width: 28px;
+    height: 28px;
+
+    border: 1px solid var(--dn-line);
+    border-radius: 8px;
+
+    background: var(--dn-paper);
+
+    font-size: 15px;
+
+    box-shadow: 0 1px 2px rgba(0,0,0,.03);
+}
+
+
+.dn-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    color: var(--dn-faint);
+
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+}
+
+
+.dn-status-dot {
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: var(--dn-violet);
+
+    box-shadow:
+        0 0 0 4px rgba(118,82,232,.10);
+}
+
+
+/* ============================================================
+   MAIN LAYOUT
+   ============================================================ */
+
+.dn-create-layout {
+    display: flex;
+    flex-direction: column;
+
+    gap: 28px;
+
+    padding-top: 30px;
+}
+
+
+/* ============================================================
+   WRITING HEADER
+   ============================================================ */
+
+.dn-writing-header {
+    margin-bottom: 26px;
+}
+
+
+.dn-kicker {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    margin: 0 0 13px;
+
+    color: var(--dn-violet);
+
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+
+.dn-kicker-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 25px;
+    height: 20px;
+    padding: 0 6px;
+
+    color: var(--dn-muted);
+
+    border: 1px solid var(--dn-line);
+    border-radius: 6px;
+
+    background: rgba(255,255,255,.7);
+
+    font-size: 9px;
+    font-variant-numeric: tabular-nums;
+}
+
+
+.dn-writing-title {
+    max-width: 760px;
+
+    margin: 0;
+
+    color: var(--dn-ink);
+
+    font-size: clamp(2.35rem, 11vw, 5.3rem);
+    font-weight: 850;
+
+    letter-spacing: -.065em;
+    line-height: .94;
+}
+
+
+.dn-writing-title-accent {
+    display: block;
+
+    background:
+        linear-gradient(
+            120deg,
+            var(--dn-violet),
+            #8060e8 50%,
+            var(--dn-cyan)
+        );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+
+.dn-writing-subtitle {
+    max-width: 480px;
+
+    margin: 17px 0 0;
+
+    color: var(--dn-muted);
+
+    font-size: 15px;
+    line-height: 1.65;
+}
+
+
+/* ============================================================
+   WRITING SURFACE
+   ============================================================ */
+
+.dn-writing-card {
+    position: relative;
+
+    background: var(--dn-paper);
+
+    border: 1px solid var(--dn-line);
+    border-radius: var(--dn-radius-lg);
+
+    box-shadow: var(--dn-shadow-lg);
+
+    overflow: hidden;
+}
+
+
+/* premium top edge */
+
+.dn-writing-card::before {
+    content: "";
+
+    position: absolute;
+    top: 0;
+    left: 8%;
+    right: 8%;
+
+    height: 1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(118,82,232,.4),
+            rgba(21,155,199,.3),
+            transparent
+        );
+}
+
+
+/* ============================================================
+   FORM
+   ============================================================ */
+
+.dn-form {
+    width: 100%;
+}
+
+
+/* ============================================================
+   FIELD
+   ============================================================ */
+
+.dn-field {
+    padding: 19px 18px;
+
+    border-bottom: 1px solid var(--dn-line);
+}
+
+.dn-field:last-of-type {
+    border-bottom: 0;
+}
+
+
+.dn-field-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-bottom: 7px;
+}
+
+
+.dn-label {
+    color: var(--dn-ink);
+
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: .10em;
+    text-transform: uppercase;
+}
+
+
+.dn-required {
+    margin-left: 3px;
+
+    color: var(--dn-violet);
+}
+
+
+.dn-field-hint {
+    color: var(--dn-faint);
+
+    font-size: 10px;
+    font-weight: 650;
+}
+
+
+/* ============================================================
+   INPUTS
+   ============================================================ */
+
+.dn-field input,
+.dn-field textarea,
+.dn-field select {
+    display: block;
+
+    width: 100%;
+    max-width: 100%;
+
+    margin: 0;
+    padding: 0;
+
+    border: 0;
+    outline: 0;
+
+    background: transparent;
+
+    color: var(--dn-ink);
+
+    font-family: inherit;
+
+    box-sizing: border-box;
+}
+
+
+.dn-field input {
+    min-height: 50px;
+
+    font-size: 20px;
+    font-weight: 680;
+
+    letter-spacing: -.025em;
+}
+
+
+.dn-field textarea {
+    min-height: 250px;
+
+    padding-top: 8px;
+
+    resize: vertical;
+
+    color: var(--dn-ink-soft);
+
+    font-size: 16px;
+    font-weight: 450;
+
+    line-height: 1.75;
+}
+
+
+.dn-field select {
+    min-height: 48px;
+
+    padding-right: 30px;
+
+    color: var(--dn-ink);
+
+    font-size: 15px;
+    font-weight: 650;
+
+    cursor: pointer;
+}
+
+
+/* placeholders */
+
+.dn-field input::placeholder,
+.dn-field textarea::placeholder {
+    color: #b8bac0;
+    opacity: 1;
+}
+
+
+/* focus */
+
+.dn-field:focus-within {
+    background:
+        linear-gradient(
+            90deg,
+            rgba(118,82,232,.035),
+            transparent 65%
+        );
+}
+
+
+.dn-field:focus-within .dn-label {
+    color: var(--dn-violet);
+}
+
+
+.dn-field input:focus,
+.dn-field textarea:focus,
+.dn-field select:focus {
+    outline: none;
+}
+
+
+/* ============================================================
+   TITLE FIELD
+   ============================================================ */
+
+.dn-field-title {
+    padding-top: 26px;
+    padding-bottom: 23px;
+}
+
+
+.dn-field-title input {
+    min-height: 62px;
+
+    font-size: clamp(1.45rem, 7vw, 2rem);
+    font-weight: 750;
+
+    letter-spacing: -.035em;
+}
+
+
+/* ============================================================
+   CONTENT FIELD
+   ============================================================ */
+
+.dn-field-content {
+    padding-top: 24px;
+    padding-bottom: 18px;
+}
+
+
+.dn-field-content textarea {
+    min-height: 300px;
+}
+
+
+/* writing meta */
+
+.dn-writing-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 14px;
+
+    padding-top: 11px;
+
+    color: var(--dn-faint);
+
+    font-size: 10px;
+}
+
+
+.dn-writing-meta span:last-child {
+    white-space: nowrap;
+
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* ============================================================
+   CATEGORY + LINK
+   ============================================================ */
+
+.dn-field-category select {
+    appearance: none;
+
+    background-image:
+        linear-gradient(45deg, transparent 50%, #8b8d94 50%),
+        linear-gradient(135deg, #8b8d94 50%, transparent 50%);
+
+    background-position:
+        calc(100% - 13px) 21px,
+        calc(100% - 8px) 21px;
+
+    background-size:
+        5px 5px,
+        5px 5px;
+
+    background-repeat: no-repeat;
+}
+
+
+.dn-field-link input {
+    font-size: 14px;
+    font-weight: 500;
+
+    letter-spacing: 0;
+}
+
+
+/* ============================================================
+   VALIDATION
+   ============================================================ */
+
+.dn-field.has-error {
+    background: rgba(201,54,88,.025);
+}
+
+
+.dn-field.has-error input,
+.dn-field.has-error textarea,
+.dn-field.has-error select {
+    color: var(--dn-danger);
+}
+
+
+.dn-error {
+    margin: 8px 0 0;
+
+    color: var(--dn-danger);
+
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+
+/* ============================================================
+   ACTION AREA
+   ============================================================ */
+
+.dn-form-footer {
+    padding: 17px 18px 19px;
+
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(246,246,243,.35),
+            rgba(246,246,243,.7)
+        );
+
+    border-top: 1px solid var(--dn-line);
+}
+
+
+.dn-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+
+    gap: 9px;
+}
+
+
+/* Buttons */
+
+.dn-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 52px;
+
+    padding: 0 20px;
+
+    border-radius: 12px;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 750;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        transform .2s ease,
+        background .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease;
+}
+
+
+.dn-btn:active {
+    transform: translateY(1px);
+}
+
+
+.dn-btn-secondary {
+    color: var(--dn-ink-soft);
+
+    background: var(--dn-paper);
+
+    border: 1px solid var(--dn-line-strong);
+}
+
+
+.dn-btn-secondary:hover {
+    color: var(--dn-ink);
+
+    border-color: rgba(23,24,28,.24);
+
+    background: #fff;
+}
+
+
+.dn-btn-primary {
+    position: relative;
+
+    color: #fff;
+
+    background: var(--dn-ink);
+
+    border: 1px solid var(--dn-ink);
+
+    box-shadow:
+        0 8px 20px rgba(23,24,28,.14);
+}
+
+
+.dn-btn-primary::after {
+    content: "";
+
+    position: absolute;
+    inset: 1px;
+
+    border-radius: 11px;
+
+    background:
+        linear-gradient(
+            115deg,
+            rgba(118,82,232,.95),
+            rgba(23,24,28,0) 55%
+        );
+
+    opacity: 0;
+
+    transition: opacity .2s ease;
+
+    pointer-events: none;
+}
+
+
+.dn-btn-primary:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 12px 28px rgba(23,24,28,.17);
+
+    background: #111217;
+}
+
+
+.dn-btn-primary:hover::after {
+    opacity: 1;
+}
+
+
+.dn-submit-content {
+    position: relative;
+    z-index: 1;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 9px;
+}
+
+
+.dn-submit-arrow {
+    font-size: 17px;
+
+    transition: transform .2s ease;
+}
+
+
+.dn-btn-primary:hover .dn-submit-arrow {
+    transform: translate(3px, -2px);
+}
+
+
+.dn-form-note {
+    margin: 10px 0 0;
+
+    color: var(--dn-faint);
+
+    font-size: 10px;
+    line-height: 1.5;
+
+    text-align: center;
+}
+
+
+/* ============================================================
+   WRITING COMPANION
+   ============================================================ */
+
+.dn-companion {
+    position: relative;
+
+    padding: 22px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(118,82,232,.075),
+            rgba(21,155,199,.035) 55%,
+            rgba(255,255,255,.7)
+        );
+
+    border: 1px solid var(--dn-line);
+
+    border-radius: var(--dn-radius-lg);
+
+    overflow: hidden;
+}
+
+
+.dn-companion::before {
+    content: "";
+
+    position: absolute;
+
+    width: 170px;
+    height: 170px;
+
+    top: -80px;
+    right: -60px;
+
+    border: 1px solid rgba(118,82,232,.12);
+
+    border-radius: 50%;
+}
+
+
+.dn-companion::after {
+    content: "";
+
+    position: absolute;
+
+    width: 105px;
+    height: 105px;
+
+    top: -48px;
+    right: -27px;
+
+    border: 1px solid rgba(21,155,199,.10);
+
+    border-radius: 50%;
+}
+
+
+.dn-companion-mark {
+    position: relative;
+    z-index: 1;
+
+    display: grid;
+    place-items: center;
+
+    width: 42px;
+    height: 42px;
+
+    margin-bottom: 20px;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--dn-violet),
+            var(--dn-cyan)
+        );
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 10px 24px rgba(118,82,232,.20);
+}
+
+
+.dn-companion-kicker {
+    margin: 0 0 8px;
+
+    color: var(--dn-violet-dark);
+
+    font-size: 9px;
+    font-weight: 850;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+
+.dn-companion h2 {
+    max-width: 320px;
+
+    margin: 0;
+
+    color: var(--dn-ink);
+
+    font-size: clamp(1.55rem, 6vw, 2rem);
+    font-weight: 800;
+
+    letter-spacing: -.045em;
+    line-height: 1.05;
+}
+
+
+.dn-companion-copy {
+    max-width: 390px;
+
+    margin: 13px 0 0;
+
+    color: var(--dn-muted);
+
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+
+.dn-companion-divider {
+    height: 1px;
+
+    margin: 21px 0;
+
+    background: var(--dn-line);
+}
+
+
+/* tips */
+
+.dn-tip {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+
+    gap: 9px;
+
+    margin-top: 16px;
+}
+
+
+.dn-tip:first-child {
+    margin-top: 0;
+}
+
+
+.dn-tip-number {
+    color: var(--dn-violet);
+
+    font-size: 9px;
+    font-weight: 850;
+}
+
+
+.dn-tip strong {
+    display: block;
+
+    color: var(--dn-ink);
+
+    font-size: 12px;
+    font-weight: 750;
+}
+
+
+.dn-tip p {
+    margin: 4px 0 0;
+
+    color: var(--dn-muted);
+
+    font-size: 11px;
+    line-height: 1.55;
+}
+
+
+/* ============================================================
+   FOCUS ACCESSIBILITY
+   ============================================================ */
+
+.dn-back:focus-visible,
+.dn-btn:focus-visible,
+.dn-field input:focus-visible,
+.dn-field textarea:focus-visible,
+.dn-field select:focus-visible {
+    outline: 3px solid rgba(118,82,232,.25);
+    outline-offset: 3px;
+}
+
+
+/* ============================================================
+   TABLET
+   ============================================================ */
+
+@media (min-width: 600px) {
+
+    .dn-create-page {
+        padding-inline: 24px;
+    }
+
+    .dn-create-layout {
+        padding-top: 42px;
+    }
+
+    .dn-field {
+        padding-inline: 28px;
+    }
+
+    .dn-form-footer {
+        padding-inline: 28px;
+    }
+
+    .dn-actions {
+        grid-template-columns: auto auto;
+        justify-content: flex-end;
+    }
+
+    .dn-btn {
+        min-width: 132px;
+    }
+
+    .dn-form-note {
+        text-align: right;
+    }
+}
+
+
+/* ============================================================
+   DESKTOP
+   ============================================================ */
+
+@media (min-width: 900px) {
+
+    .dn-create-page {
+        padding-inline: 32px;
+        padding-bottom: 80px;
+    }
+
+    .dn-create-top {
+        min-height: 76px;
+    }
+
+    .dn-create-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 720px) 300px;
+
+        align-items: start;
+
+        justify-content: space-between;
+
+        gap: clamp(40px, 7vw, 100px);
+
+        padding-top: 62px;
+    }
+
+    .dn-writing-header {
+        margin-bottom: 34px;
+    }
+
+    .dn-writing-title {
+        font-size: clamp(3.8rem, 6vw, 5.3rem);
+    }
+
+    .dn-writing-subtitle {
+        font-size: 16px;
+    }
+
+    .dn-writing-card {
+        border-radius: 26px;
+    }
+
+    .dn-field {
+        padding-inline: 34px;
+    }
+
+    .dn-field-title {
+        padding-top: 30px;
+        padding-bottom: 27px;
+    }
+
+    .dn-field-content textarea {
+        min-height: 390px;
+    }
+
+    .dn-form-footer {
+        padding: 20px 34px 22px;
+    }
+
+    .dn-companion {
+        position: sticky;
+        top: 90px;
+
+        padding: 25px;
+    }
+}
+
+
+/* ============================================================
+   LARGE DESKTOP
+   ============================================================ */
+
+@media (min-width: 1200px) {
+
+    .dn-create-layout {
+        grid-template-columns: minmax(0, 730px) 320px;
+
+        gap: 120px;
+    }
+}
+
+
+/* ============================================================
+   EXTRA LARGE
+   ============================================================ */
+
+@media (min-width: 1500px) {
+
+    .dn-create-layout {
+        grid-template-columns: 760px 330px;
+    }
+}
+
+
+/* ============================================================
+   SMALL MOBILE
+   ============================================================ */
+
+@media (max-width: 359px) {
+
+    .dn-create-page {
+        padding-inline: 10px;
+    }
+
+    .dn-create-top {
+        min-height: 62px;
+    }
+
+    .dn-status {
+        font-size: 9px;
+    }
+
+    .dn-writing-title {
+        font-size: 2.2rem;
+    }
+
+    .dn-writing-subtitle {
+        font-size: 14px;
+    }
+
+    .dn-field {
+        padding-inline: 15px;
+    }
+
+    .dn-field-content textarea {
+        min-height: 240px;
+    }
+
+    .dn-form-footer {
+        padding-inline: 15px;
+    }
+
+    .dn-companion {
+        padding: 18px;
+    }
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .dn-back,
+    .dn-btn,
+    .dn-submit-arrow {
+        transition: none;
+    }
+}
+</style>
+
+
+<section class="dn-create-page">
+
+    <div class="dn-create-container">
+
+        <!-- Context bar -->
+        <header class="dn-create-top">
+
+            <a
+                class="dn-back"
+                href="{% url 'notes:index' %}"
+                aria-label="Back to notes"
+            >
+                <span class="dn-back-arrow" aria-hidden="true">←</span>
                 <span>Notes</span>
             </a>
 
-            <div class="writer-status">
-                <span class="status-dot" aria-hidden="true"></span>
+            <div class="dn-status">
+                <span class="dn-status-dot" aria-hidden="true"></span>
                 New note
             </div>
+
         </header>
 
 
-        <div class="writer-layout">
+        <div class="dn-create-layout">
 
-            <!-- Main writing area -->
-            <main class="writer-main">
+            <!-- ==================================================
+                 WRITING AREA
+                 ================================================== -->
 
-                <div class="writer-intro">
-                    <p class="writer-eyebrow">
-                        <span>01</span>
+            <main>
+
+                <header class="dn-writing-header">
+
+                    <p class="dn-kicker">
+                        <span class="dn-kicker-number">01</span>
                         Capture something useful
                     </p>
 
-                    <h1 id="writer-title">
-                        Create a new note
+                    <h1 class="dn-writing-title">
+                        Give your idea
+                        <span class="dn-writing-title-accent">
+                            a place to land.
+                        </span>
                     </h1>
 
-                    <p class="writer-subtitle">
-                        Give the useful idea a place to land.
+                    <p class="dn-writing-subtitle">
+                        Write it down now. Make it easier for future you
+                        to find, understand, and use.
                     </p>
-                </div>
+
+                </header>
 
 
-                <form
-                    class="note-form writer-form"
-                    method="post"
-                    novalidate
-                    data-note-form
-                >
-                    {% csrf_token %}
+                <div class="dn-writing-card">
 
-                    {% for field in form %}
+                    <form
+                        class="dn-form"
+                        method="post"
+                        novalidate
+                        data-note-form
+                    >
 
-                        <div
-                            class="writer-field writer-field-{{ field.name }}{% if field.errors %} has-error{% endif %}"
-                        >
+                        {% csrf_token %}
 
-                            <div class="field-header">
-                                <label
-                                    class="writer-label"
-                                    for="{{ field.id_for_label }}"
-                                >
-                                    {{ field.label }}
 
-                                    {% if field.field.required %}
-                                        <span class="required-mark" aria-hidden="true">*</span>
+                        {% for field in form %}
+
+                            <div
+                                class="dn-field dn-field-{{ field.name }}{% if field.errors %} has-error{% endif %}"
+                            >
+
+                                <div class="dn-field-header">
+
+                                    <label
+                                        class="dn-label"
+                                        for="{{ field.id_for_label }}"
+                                    >
+                                        {{ field.label }}
+
+                                        {% if field.field.required %}
+                                            <span
+                                                class="dn-required"
+                                                aria-hidden="true"
+                                            >*</span>
+                                        {% endif %}
+                                    </label>
+
+
+                                    {% if field.name == "title" %}
+                                        <span class="dn-field-hint">
+                                            Be specific
+                                        </span>
+
+                                    {% elif field.name == "content" %}
+                                        <span class="dn-field-hint">
+                                            Your words
+                                        </span>
+
+                                    {% elif field.name == "category" %}
+                                        <span class="dn-field-hint">
+                                            Organize it
+                                        </span>
+
+                                    {% elif field.name == "link" %}
+                                        <span class="dn-field-hint">
+                                            Optional
+                                        </span>
                                     {% endif %}
-                                </label>
 
-                                {% if field.name == "title" %}
-                                    <span class="field-hint">Be specific</span>
-                                {% elif field.name == "content" %}
-                                    <span class="field-hint">Your words</span>
-                                {% elif field.name == "link" %}
-                                    <span class="field-hint">Optional</span>
+                                </div>
+
+
+                                {{ field }}
+
+
+                                {% if field.name == "content" %}
+
+                                    <div class="dn-writing-meta">
+                                        <span>
+                                            Write in your own words.
+                                        </span>
+
+                                        <span data-content-count>
+                                            0 characters
+                                        </span>
+                                    </div>
+
                                 {% endif %}
+
+
+                                {% if field.help_text %}
+                                    <p class="dn-field-hint">
+                                        {{ field.help_text }}
+                                    </p>
+                                {% endif %}
+
+
+                                {% for error in field.errors %}
+
+                                    <p
+                                        class="dn-error"
+                                        role="alert"
+                                    >
+                                        {{ error }}
+                                    </p>
+
+                                {% endfor %}
+
                             </div>
 
-                            {{ field }}
+                        {% endfor %}
 
-                            {% if field.name == "content" %}
-                                <div class="writing-meta">
-                                    <span>Write in your own words.</span>
-                                    <span data-content-count>0 characters</span>
-                                </div>
-                            {% endif %}
 
-                            {% if field.help_text %}
-                                <p class="field-help">{{ field.help_text }}</p>
-                            {% endif %}
+                        <!-- Actions -->
 
-                            {% for error in field.errors %}
-                                <p class="field-error" role="alert">
-                                    {{ error }}
-                                </p>
-                            {% endfor %}
+                        <div class="dn-form-footer">
+
+                            <div class="dn-actions">
+
+                                <a
+                                    class="dn-btn dn-btn-secondary"
+                                    href="{% url 'notes:index' %}"
+                                >
+                                    Cancel
+                                </a>
+
+
+                                <button
+                                    class="dn-btn dn-btn-primary"
+                                    type="submit"
+                                >
+
+                                    <span class="dn-submit-content">
+                                        <span>Save note</span>
+
+                                        <span
+                                            class="dn-submit-arrow"
+                                            aria-hidden="true"
+                                        >↗</span>
+                                    </span>
+
+                                </button>
+
+                            </div>
+
+
+                            <p class="dn-form-note">
+                                Your note will be added to your knowledge vault.
+                            </p>
 
                         </div>
 
-                    {% endfor %}
+                    </form>
 
-
-                    <!-- Actions -->
-                    <div class="writer-actions">
-
-                        <a
-                            class="btn btn-secondary writer-cancel"
-                            href="{% url 'notes:index' %}"
-                        >
-                            Cancel
-                        </a>
-
-                        <button
-                            class="btn btn-primary writer-submit"
-                            type="submit"
-                        >
-                            <span>Save note</span>
-                            <span class="submit-arrow" aria-hidden="true">↗</span>
-                        </button>
-
-                    </div>
-
-                    <p class="writer-shortcut">
-                        Your note will be added to your knowledge vault.
-                    </p>
-
-                </form>
+                </div>
 
             </main>
 
 
-            <!-- Writing companion -->
+            <!-- ==================================================
+                 WRITING COMPANION
+                 ================================================== -->
+
             <aside
-                class="writer-aside"
+                class="dn-companion"
                 aria-label="Writing guidance"
             >
 
-                <div class="aside-mark" aria-hidden="true">
-                    <span>✦</span>
+                <div
+                    class="dn-companion-mark"
+                    aria-hidden="true"
+                >
+                    ✦
                 </div>
 
-                <p class="aside-kicker">
+
+                <p class="dn-companion-kicker">
                     A thought worth keeping
                 </p>
+
 
                 <h2>
                     What will future you need?
                 </h2>
 
-                <p class="aside-copy">
-                    Capture the context, the useful detail, and the next step.
-                    A little signal now makes this note easier to return to later.
+
+                <p class="dn-companion-copy">
+                    Capture the context, the useful detail, and the
+                    next step. A little signal now makes this note
+                    easier to return to later.
                 </p>
 
-                <div class="aside-divider"></div>
 
-                <div class="aside-tip">
-                    <span class="tip-number">01</span>
+                <div class="dn-companion-divider"></div>
+
+
+                <div class="dn-tip">
+
+                    <span class="dn-tip-number">
+                        01
+                    </span>
 
                     <div>
-                        <strong>Make the title searchable.</strong>
+                        <strong>
+                            Make the title searchable.
+                        </strong>
+
                         <p>
-                            Write it so you can understand the note
+                            Write it so you understand the note
                             even a month from now.
                         </p>
                     </div>
+
                 </div>
 
-                <div class="aside-tip">
-                    <span class="tip-number">02</span>
+
+                <div class="dn-tip">
+
+                    <span class="dn-tip-number">
+                        02
+                    </span>
 
                     <div>
-                        <strong>Capture the useful detail.</strong>
+                        <strong>
+                            Capture the useful detail.
+                        </strong>
+
                         <p>
-                            Don't just save the idea. Save why it matters.
+                            Don't only save the idea. Save why
+                            it matters.
                         </p>
                     </div>
+
+                </div>
+
+
+                <div class="dn-tip">
+
+                    <span class="dn-tip-number">
+                        03
+                    </span>
+
+                    <div>
+                        <strong>
+                            Leave a trail back.
+                        </strong>
+
+                        <p>
+                            Add a useful link when the idea
+                            came from somewhere else.
+                        </p>
+                    </div>
+
                 </div>
 
             </aside>
@@ -185,4 +1481,5 @@
     </div>
 
 </section>
+
 {% endblock %}
