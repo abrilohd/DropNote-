@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}About DropNote{% endblock %}
+{% block content %}
+<section class="about-hero">
+    <div>
+        <p class="eyebrow"><span class="eyebrow-dot"></span> About DropNote</p>
+        <h1 class="editorial-title">A quieter way to keep <em>useful things.</em></h1>
+    </div>
+    <p class="about-lede">DropNote is a focused home for the ideas you want to revisit. No noisy feed, no complicated system, just enough structure to make your knowledge easier to trust and return to.</p>
+</section>
+<section id="how-it-works" class="about-process" aria-labelledby="process-title">
+    <div class="about-section-heading"><p class="eyebrow"><span class="eyebrow-dot"></span> The method</p><h2 id="process-title">Make room for signal.</h2></div>
+    <div class="feature-strip"><div><span class="feature-number">01</span><h3>Capture<span>.</span></h3><p>Get the thought out of your head and into a place you trust.</p></div><div><span class="feature-number">02</span><h3>Organize<span>.</span></h3><p>Give useful things just enough structure to find them again.</p></div><div><span class="feature-number">03</span><h3>Return<span>.</span></h3><p>Build a personal library that gets better with every note.</p></div></div>
+</section>
+<section class="about-invite"><div><p class="eyebrow"><span class="eyebrow-dot"></span> Start anywhere</p><h2>Your next good idea deserves a place to land.</h2></div><a class="btn btn-primary" href="{% url 'notes:create' %}">Write a note <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></a></section>
+{% endblock content %}

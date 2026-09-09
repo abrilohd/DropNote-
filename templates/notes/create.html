@@ -1,26 +1,188 @@
 {% extends "base.html" %}
+
 {% block title %}New note — DropNote{% endblock %}
+
 {% block content %}
-<section class="form-page writer-page">
-	<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="{% url 'notes:index' %}">Notes</a><span aria-hidden="true">/</span><span aria-current="page">New note</span></nav>
-	<div class="writer-layout">
-		<div class="writer-main">
-			<div class="form-heading writer-heading"><p class="eyebrow"><span class="eyebrow-dot"></span> New entry</p><h1 class="page-title">Create a new note</h1><p>Give the useful idea a place to land.</p></div>
-			<form class="note-form" method="post" novalidate data-note-form>
-				{% csrf_token %}
-				{% for field in form %}
-				<div class="form-group form-group-{{ field.name }}{% if field.errors %} has-error{% endif %}">
-					<label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span aria-hidden="true">*</span>{% endif %}</label>
-					{{ field }}
-					{% if field.name == "content" %}<div class="writing-meta"><span>Write in your own words.</span><span data-content-count>0 characters</span></div>{% endif %}
-					{% if field.help_text %}<p class="field-help">{{ field.help_text }}</p>{% endif %}
-					{% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
-				</div>
-				{% endfor %}
-				<div class="form-actions"><a class="btn btn-secondary" href="{% url 'notes:index' %}">Cancel</a><button class="btn btn-primary" type="submit">Create note <span aria-hidden="true">&#8594;</span></button></div>
-			</form>
-		</div>
-		<aside class="writer-aside" aria-label="Writing guidance"><div class="aside-orbit" aria-hidden="true">✦</div><p class="aside-kicker">A small prompt</p><h2>What will future you need?</h2><p>Capture the context, the useful detail, and the next step. A little signal now makes this note easier to return to later.</p><div class="aside-rule"></div><p class="aside-tip"><strong>Tip</strong><br>Keep the title specific enough to find in a month.</p></aside>
-	</div>
+<section class="writer-page" aria-labelledby="writer-title">
+
+    <div class="writer-shell">
+
+        <!-- Header -->
+        <header class="writer-topbar">
+            <a class="writer-back" href="{% url 'notes:index' %}" aria-label="Back to notes">
+                <span aria-hidden="true">←</span>
+                <span>Notes</span>
+            </a>
+
+            <div class="writer-status">
+                <span class="status-dot" aria-hidden="true"></span>
+                New note
+            </div>
+        </header>
+
+
+        <div class="writer-layout">
+
+            <!-- Main writing area -->
+            <main class="writer-main">
+
+                <div class="writer-intro">
+                    <p class="writer-eyebrow">
+                        <span>01</span>
+                        Capture something useful
+                    </p>
+
+                    <h1 id="writer-title">
+                        Create a new note
+                    </h1>
+
+                    <p class="writer-subtitle">
+                        Give the useful idea a place to land.
+                    </p>
+                </div>
+
+
+                <form
+                    class="note-form writer-form"
+                    method="post"
+                    novalidate
+                    data-note-form
+                >
+                    {% csrf_token %}
+
+                    {% for field in form %}
+
+                        <div
+                            class="writer-field writer-field-{{ field.name }}{% if field.errors %} has-error{% endif %}"
+                        >
+
+                            <div class="field-header">
+                                <label
+                                    class="writer-label"
+                                    for="{{ field.id_for_label }}"
+                                >
+                                    {{ field.label }}
+
+                                    {% if field.field.required %}
+                                        <span class="required-mark" aria-hidden="true">*</span>
+                                    {% endif %}
+                                </label>
+
+                                {% if field.name == "title" %}
+                                    <span class="field-hint">Be specific</span>
+                                {% elif field.name == "content" %}
+                                    <span class="field-hint">Your words</span>
+                                {% elif field.name == "link" %}
+                                    <span class="field-hint">Optional</span>
+                                {% endif %}
+                            </div>
+
+                            {{ field }}
+
+                            {% if field.name == "content" %}
+                                <div class="writing-meta">
+                                    <span>Write in your own words.</span>
+                                    <span data-content-count>0 characters</span>
+                                </div>
+                            {% endif %}
+
+                            {% if field.help_text %}
+                                <p class="field-help">{{ field.help_text }}</p>
+                            {% endif %}
+
+                            {% for error in field.errors %}
+                                <p class="field-error" role="alert">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+
+                        </div>
+
+                    {% endfor %}
+
+
+                    <!-- Actions -->
+                    <div class="writer-actions">
+
+                        <a
+                            class="btn btn-secondary writer-cancel"
+                            href="{% url 'notes:index' %}"
+                        >
+                            Cancel
+                        </a>
+
+                        <button
+                            class="btn btn-primary writer-submit"
+                            type="submit"
+                        >
+                            <span>Save note</span>
+                            <span class="submit-arrow" aria-hidden="true">↗</span>
+                        </button>
+
+                    </div>
+
+                    <p class="writer-shortcut">
+                        Your note will be added to your knowledge vault.
+                    </p>
+
+                </form>
+
+            </main>
+
+
+            <!-- Writing companion -->
+            <aside
+                class="writer-aside"
+                aria-label="Writing guidance"
+            >
+
+                <div class="aside-mark" aria-hidden="true">
+                    <span>✦</span>
+                </div>
+
+                <p class="aside-kicker">
+                    A thought worth keeping
+                </p>
+
+                <h2>
+                    What will future you need?
+                </h2>
+
+                <p class="aside-copy">
+                    Capture the context, the useful detail, and the next step.
+                    A little signal now makes this note easier to return to later.
+                </p>
+
+                <div class="aside-divider"></div>
+
+                <div class="aside-tip">
+                    <span class="tip-number">01</span>
+
+                    <div>
+                        <strong>Make the title searchable.</strong>
+                        <p>
+                            Write it so you can understand the note
+                            even a month from now.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="aside-tip">
+                    <span class="tip-number">02</span>
+
+                    <div>
+                        <strong>Capture the useful detail.</strong>
+                        <p>
+                            Don't just save the idea. Save why it matters.
+                        </p>
+                    </div>
+                </div>
+
+            </aside>
+
+        </div>
+
+    </div>
+
 </section>
 {% endblock %}

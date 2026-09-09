@@ -1,12 +1,19 @@
 const navToggle = document.querySelector('.nav-toggle');
 const primaryNav = document.querySelector('#primary-nav');
 
+const closeMobileMenu = () => {
+	if (!navToggle || !primaryNav) return;
+	navToggle.setAttribute('aria-expanded', 'false');
+	primaryNav.classList.remove('is-open');
+};
+
 const setTheme = (theme) => {
 	const isDark = theme === 'dark';
 	document.documentElement.dataset.theme = theme;
 	document.querySelectorAll('[data-theme-toggle]').forEach((toggle) => {
 		toggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
-		toggle.querySelector('.theme-toggle-label').textContent = isDark ? 'Light mode' : 'Dark mode';
+		const label = toggle.querySelector('.theme-toggle-label');
+		if (label) label.textContent = isDark ? 'Light mode' : 'Dark mode';
 	});
 	document.querySelector('meta[name="theme-color"]')?.setAttribute('content', isDark ? '#17181c' : '#f5f5f2');
 };
@@ -26,6 +33,19 @@ navToggle?.addEventListener('click', () => {
 	const isOpen = navToggle.getAttribute('aria-expanded') === 'true';
 	navToggle.setAttribute('aria-expanded', String(!isOpen));
 	primaryNav?.classList.toggle('is-open', !isOpen);
+});
+
+primaryNav?.querySelectorAll('a').forEach((link) => {
+	link.addEventListener('click', closeMobileMenu);
+});
+
+document.addEventListener('click', (event) => {
+	if (!primaryNav || !navToggle) return;
+	const clickedInsideMenu = primaryNav.contains(event.target);
+	const clickedToggle = navToggle.contains(event.target);
+	if (!clickedInsideMenu && !clickedToggle && primaryNav.classList.contains('is-open')) {
+		closeMobileMenu();
+	}
 });
 
 document.querySelector('[data-clear-search]')?.addEventListener('click', (event) => {
