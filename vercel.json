@@ -1,15 +1,9 @@
 {
   "buildCommand": "python manage.py collectstatic --noinput",
-  "builds": [
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
+  "rewrites": [
     {
       "src": "/(.*)",
-      "dest": "api/index.py"
+      "dest": "/api"
     }
   ]
 }
