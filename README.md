@@ -36,7 +36,15 @@ If Vercel shows a deployment as **Canceled**, create a new deployment from the l
 
 ### 2. Create PostgreSQL
 
-Create a PostgreSQL database with Neon, Supabase, or another PostgreSQL provider. Copy the complete connection string.
+Create a PostgreSQL database with Neon, Supabase, Railway, or another PostgreSQL provider. Copy the complete connection string from the provider's **Public Network** connection details.
+
+If the database is hosted on Railway, do not copy Railway's internal reference syntax into Vercel:
+
+```text
+${{ Postgres-ELr4.DATABASE_URL }}
+```
+
+That syntax works only between services inside Railway. In Vercel, paste the actual public URL, which starts with `postgresql://` and contains the database host, port, username, password, and database name.
 
 ### 3. Add environment variables
 
@@ -47,7 +55,7 @@ DJANGO_SECRET_KEY=<long-random-secret>
 DJANGO_DEBUG=False
 DJANGO_ALLOWED_HOSTS=<your-project>.vercel.app
 DJANGO_CSRF_TRUSTED_ORIGINS=https://<your-project>.vercel.app
-DATABASE_URL=postgresql://<user>:<password>@<host>:<port>/<database>
+DATABASE_URL=postgresql://<user>:<password>@<public-host>:<port>/<database>?sslmode=require
 ```
 
 Use the exact domain from **Settings > Domains**. For a custom domain, include both domains as comma-separated values:
@@ -61,7 +69,7 @@ Never commit `DATABASE_URL` or `DJANGO_SECRET_KEY` to GitHub.
 
 ### 4. Run migrations
 
-After creating the database, run migrations against the production database from a secure terminal. On PowerShell:
+After creating the database, run migrations against the production database from a secure terminal. On PowerShell, replace the placeholder with the actual public PostgreSQL URL. Keep the command and URL on separate lines:
 
 ```powershell
 $env:DATABASE_URL="your-production-postgresql-url"
