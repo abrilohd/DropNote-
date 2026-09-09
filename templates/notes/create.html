@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}New note — DropNote{% endblock %}
+{% block content %}
+<section class="form-page writer-page">
+	<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="{% url 'notes:index' %}">Notes</a><span aria-hidden="true">/</span><span aria-current="page">New note</span></nav>
+	<div class="writer-layout">
+		<div class="writer-main">
+			<div class="form-heading writer-heading"><p class="eyebrow"><span class="eyebrow-dot"></span> New entry</p><h1 class="page-title">Create a new note</h1><p>Give the useful idea a place to land.</p></div>
+			<form class="note-form" method="post" novalidate data-note-form>
+				{% csrf_token %}
+				{% for field in form %}
+				<div class="form-group form-group-{{ field.name }}{% if field.errors %} has-error{% endif %}">
+					<label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span aria-hidden="true">*</span>{% endif %}</label>
+					{{ field }}
+					{% if field.name == "content" %}<div class="writing-meta"><span>Write in your own words.</span><span data-content-count>0 characters</span></div>{% endif %}
+					{% if field.help_text %}<p class="field-help">{{ field.help_text }}</p>{% endif %}
+					{% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+				</div>
+				{% endfor %}
+				<div class="form-actions"><a class="btn btn-secondary" href="{% url 'notes:index' %}">Cancel</a><button class="btn btn-primary" type="submit">Create note <span aria-hidden="true">&#8594;</span></button></div>
+			</form>
+		</div>
+		<aside class="writer-aside" aria-label="Writing guidance"><div class="aside-orbit" aria-hidden="true">✦</div><p class="aside-kicker">A small prompt</p><h2>What will future you need?</h2><p>Capture the context, the useful detail, and the next step. A little signal now makes this note easier to return to later.</p><div class="aside-rule"></div><p class="aside-tip"><strong>Tip</strong><br>Keep the title specific enough to find in a month.</p></aside>
+	</div>
+</section>
+{% endblock %}

@@ -1,0 +1,3 @@
+{% extends "base.html" %}
+{% block title %}Page not found — DropNote{% endblock %}
+{% block content %}<section class="error-page"><span class="error-code">404</span><h1>This page drifted away.</h1><p>The note or page you were looking for does not exist.</p><a class="btn btn-primary" href="{% url 'home' %}">Return home <span aria-hidden="true">&#8594;</span></a></section>{% endblock %}
